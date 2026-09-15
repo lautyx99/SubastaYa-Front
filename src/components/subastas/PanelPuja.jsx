@@ -5,8 +5,11 @@ import Form from 'react-bootstrap/Form'
 import Alert from 'react-bootstrap/Alert'
 import Spinner from 'react-bootstrap/Spinner'
 import { crearPuja } from '../../api/pujasApi'
+import {useToast} from '../../context/ToastContext'
+import { Link } from 'react-router-dom'
+import { getToken , getUserId, getUserRol} from '../../utils/auth'
 
-function PanelPuja({ subasta, onPujaCreada }) {
+function PanelPuja({ subasta, pujas = [], usuarioActualId, onPujaCreada}) {
   const incremento = Number(subasta.incrementoMinimo) || 0
   const ofertaActual = Number(subasta.mejorPuja ?? subasta.precioInicial) || 0
 
@@ -14,6 +17,27 @@ function PanelPuja({ subasta, onPujaCreada }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [exito, setExito] = useState(null)
+
+   const { push } = useToast()
+
+   const userId = usuarioActualId ?? getUserId()
+   const rol = getUserRol().toLowerCase()
+
+   const esMiSubasta = userId != null && subasta.vendedorId === userId
+   const esVendedor = rol === 'vendedor'
+   const esComprador = rol === 'comprador'
+
+   
+
+  const mejor = pujas?.length
+  ? pujas.reduce((a, b) => (Number(b.monto) > Number(a.monto) ? b : a))
+  : null
+
+const voyLiderando =
+  usuarioActualId && mejor && mejor.compradorId === usuarioActualId
+
+const fuiSuperado =
+  usuarioActualId && mejor && mejor.compradorId !== usuarioActualId
 
   useEffect(() => {
     setMonto(String(ofertaActual + incremento))
@@ -37,30 +61,43 @@ function PanelPuja({ subasta, onPujaCreada }) {
     }
 
     setLoading(true)
-    try {
+      try {
       await crearPuja({
         subastaId: subasta.id,
         monto: montoNumero,
       })
+
+      // Solo si salió bien
+      push(`¡Puja registrada por $${montoNumero.toLocaleString('es-AR')}!`, 'success')
       setExito(`¡Puja registrada por $${montoNumero.toLocaleString('es-AR')}!`)
-      onPujaCreada?.() // para recargar pujas en el detalle
-    } catch (err) {
+      onPujaCreada?.()
+      } catch (err) {
       const msg =
-        err.response?.data?.message ||
-        err.response?.data?.title ||
-        (typeof err.response?.data === 'string' ? err.response.data : null) ||
-        err.message ||
-        'No se pudo realizar la puja'
+      err.response?.data?.message ||
+      err.response?.data?.title ||
+      (typeof err.response?.data === 'string' ? err.response.data : null) ||
+      err.message ||
+      'No se pudo realizar la puja'
+
+      // Error (400 saldo, validación, etc.)
+      if (err.response?.status === 400) {
+      push(msg || 'Fondos insuficientes o monto inválido', 'danger')
+      } else {
+      push(msg, 'danger')
+      }
+
       setError(msg)
-    } finally {
+      } finally {
       setLoading(false)
-    }
+      }
   }
 
   
   const puedePujar =
   !loading &&
-  String(subasta?.estado || '').trim().toLowerCase() === 'activa'
+  String(subasta?.estado || '').trim().toLowerCase() === 'activa' &&
+  Boolean(getToken()) &&
+  !esMiSubasta
 
   return (
     
@@ -85,6 +122,29 @@ function PanelPuja({ subasta, onPujaCreada }) {
             <strong>Cierra:</strong>{' '}
             {new Date(subasta.fechaFin).toLocaleString('es-AR')}
           </p>
+
+          {voyLiderando && (
+          <Alert variant="success" className="py-2 small">
+            ✅ Vas liderando esta subasta
+          </Alert>
+          )}
+          {fuiSuperado && (
+          <Alert variant="warning" className="py-2 small">
+            ⚠️ Te han superado. Nueva oferta: ${Number(mejor.monto).toLocaleString('es-AR')}
+          </Alert>
+          )}
+
+          {!getToken() && (
+          <Alert variant="info" className="py-2 small">
+          <Link to="/login">Iniciá sesión</Link> para pujar.
+          </Alert>
+          )}
+
+          {esMiSubasta && (
+          <Alert variant="secondary" className="py-2 small">
+          No podés pujar en tu propia subasta.
+          </Alert>
+          )}
 
           <Form.Group className="mb-2">
             <Form.Label>Tu oferta</Form.Label>

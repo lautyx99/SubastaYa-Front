@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 import Card from 'react-bootstrap/Card'
 import { login } from '../api/authApi'
+import { getRoleFromToken, getUserIdFromToken } from '../utils/auth'
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -21,6 +22,8 @@ function LoginPage() {
     try {
       const data = await login({ email, password })
       const token = data.token || data.accessToken
+      const id = data.id ?? data.userId ?? getUserIdFromToken(token)
+      const rol = data.rol ?? data.role ?? data.Rol
 
       if (!token) {
         setError('El servidor no devolvió un token')
@@ -28,9 +31,15 @@ function LoginPage() {
       }
 
       localStorage.setItem('token', token)
+      if (id) localStorage.setItem('userId', String(id))
       if (data.email) localStorage.setItem('userEmail', data.email)
       if (data.nombre) localStorage.setItem('userNombre', data.nombre)
-      if (data.rol) localStorage.setItem('userRol', data.rol)
+      
+      if (data.rol) localStorage.setItem('userRol', data.rol); else {
+       // fallback desde el JWT
+        const rolJwt = getRoleFromToken(token)
+        if (rolJwt) localStorage.setItem('userRol', rolJwt)
+        }
 
       navigate('/')
     } catch (err) {

@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Card from 'react-bootstrap/Card'
-import Spinner from 'react-bootstrap/Spinner'
 import Alert from 'react-bootstrap/Alert'
 import { getSubastaById } from '../api/subastasApi'
 import { getPujasBySubasta } from '../api/pujasApi'
@@ -11,56 +10,69 @@ import SubastaGaleria from '../components/subastas/SubastaGaleria'
 import SubastaInfo from '../components/subastas/SubastaInfo'
 import ListaPujas from '../components/pujas/ListaPujas'
 import PanelPuja from '../components/subastas/PanelPuja'
+import Countdown from '../components/subastas/Countdown'
 
-
-function SubastaDetallePage() {
+function SubastaDetallesPage() {
   const { id } = useParams()
   const [subasta, setSubasta] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [pujas, setPujas] = useState([])
-
-  const cargarDetalle = () => {
-  setLoading(true)
-  Promise.all([getSubastaById(id), getPujasBySubasta(id)])
-    .then(([subastaData, pujasData]) => {
-      setSubasta(subastaData)
-      setPujas(pujasData)
-    })
-    .catch((err) => setError(err.message || 'Error al cargar el detalle'))
-    .finally(() => setLoading(false))
-}
-
+  const [fechaFinPrev, setFechaFinPrev] = useState(null)
+  const usuarioActualId = Number(localStorage.getItem('userId')) || null
 
   useEffect(() => {
-    setLoading(true)
-    getSubastaById(id)
-      .then(setSubasta)
-      .catch((err) => setError(err.message || 'Error al cargar la subasta'))
-      .finally(() => setLoading(false))
-  }, [id])
+  if (!subasta?.fechaFin) return
+  if (fechaFinPrev && new Date(subasta.fechaFin) > new Date(fechaFinPrev)) {
+    push('⚠️ Se extendió el tiempo de la subasta (anti-sniping)', 'warning')
+  }
+  setFechaFinPrev(subasta.fechaFin)
+}, [subasta?.fechaFin])
 
-  Promise.all([getSubastaById(id), getPujasBySubasta(id)])
+  const cargarDetalle = () => {
+    setLoading(true)
+    Promise.all([getSubastaById(id), getPujasBySubasta(id)])
       .then(([subastaData, pujasData]) => {
         setSubasta(subastaData)
         setPujas(pujasData)
       })
       .catch((err) => setError(err.message || 'Error al cargar el detalle'))
       .finally(() => setLoading(false))
+  }
+useEffect(() => {
+  let cancelado = false
 
+  const cargar = (mostrarSpinner = false) => {
+    if (mostrarSpinner) setLoading(true)
 
-      useEffect(() => {
-  cargarDetalle()
+    Promise.all([getSubastaById(id), getPujasBySubasta(id)])
+      .then(([subastaData, pujasData]) => {
+        if (cancelado) return
+        setSubasta(subastaData)
+        setPujas(pujasData)
+        setError(null)
+      })
+      .catch((err) => {
+        if (cancelado) return
+        setError(err.message || 'Error al cargar el detalle')
+      })
+      .finally(() => {
+        if (!cancelado && mostrarSpinner) setLoading(false)
+      })
+  }
+
+  // Primera carga (con spinner)
+  cargar(true)
+
+  // Actualización en vivo cada 4s (sin spinner)
+  const intervalId = setInterval(() => cargar(false), 4000)
+
+  return () => {
+    cancelado = true
+    clearInterval(intervalId)
+  }
 }, [id])
 
-  if (loading) {
-    return (
-      <div className="text-center py-5">
-        <Spinner animation="border" />
-        <p className="mt-2">Cargando subasta...</p>
-      </div>
-    )
-  }
 
   if (error) return <Alert variant="danger">{error}</Alert>
   if (!subasta) return <Alert variant="warning">No se encontró la subasta</Alert>
@@ -69,37 +81,42 @@ function SubastaDetallePage() {
     ? Math.max(...pujas.map((p) => Number(p.monto)))
     : null
 
-    // para que el panel use la mejor oferta real
   const subastaConOferta = {
     ...subasta,
     mejorPuja: mejorPuja ?? subasta.mejorPuja ?? subasta.precioInicial,
   }
 
   return (
-   <div>
+    <div>
       <Link to="/" className="d-inline-block mb-3 text-decoration-none">
         ← Volver a Subastas Activas
       </Link>
 
       <Row className="g-4">
         <Col lg={7}>
-          <SubastaInfo subasta={subasta} />
-          <SubastaGaleria titulo={subasta.titulo} urlImagen={subasta.urlImagen} />
+  <SubastaInfo subasta={subasta} />
+  <SubastaGaleria titulo={subasta.titulo}
+  urlImagen={subasta.urlImagen}/>
+  <Card className="shadow-sm mt-3">
+    <Card.Body>
+      <Card.Title className="h5">Historial de ofertas</Card.Title>
+      <ListaPujas pujas={pujas} usuarioActualId={usuarioActualId} />
+    </Card.Body>
+  </Card>
+</Col>
 
-          <Card className="shadow-sm mt-3">
-            <Card.Body>
-              <Card.Title className="h5">Historial de pujas</Card.Title>
-              <ListaPujas pujas={pujas} />
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col lg={5}>
-          <PanelPuja subasta={subastaConOferta} onPujaCreada={cargarDetalle}/>
-        </Col>
+<Col lg={5}>
+  <Countdown fechaFin={subasta.fechaFin} />
+  <PanelPuja
+    subasta={subastaConOferta}
+    pujas={pujas}
+    usuarioActualId={usuarioActualId}
+    onPujaCreada={cargarDetalle}
+  />
+</Col>
       </Row>
     </div>
   )
 }
 
-export default SubastaDetallePage
+export default SubastaDetallesPage
