@@ -67,6 +67,8 @@ const fuiSuperado =
         monto: montoNumero,
       })
 
+      window.dispatchEvent(new Event('billeteraActualizada'));
+
       // Solo si salió bien
       push(`¡Puja registrada por $${montoNumero.toLocaleString('es-AR')}!`, 'success')
       setExito(`¡Puja registrada por $${montoNumero.toLocaleString('es-AR')}!`)

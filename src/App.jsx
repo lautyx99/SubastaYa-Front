@@ -7,6 +7,7 @@ import CrearSubastaPage from './pages/CrearSubastaPage'
 import { ToastProvider } from './context/ToastContext'
 import BilleteraPage from './pages/BilleteraPage'
 import SoloVendedores from './components/auth/SoloVendedores'
+import ActividadesPage from './pages/ActividadesPage'
 
 function App() {
 return (
@@ -25,6 +26,7 @@ return (
               <CrearSubastaPage />
             </SoloVendedores>
           }/>
+          <Route path="/mis-actividades" element={<ActividadesPage />} />
       </Routes>
       </MainLayout>
     </BrowserRouter>

@@ -1,12 +1,37 @@
 export const getToken = () => localStorage.getItem('token')
+
 export const getUserId = () => {
   const id = Number(localStorage.getItem('userId'))
   return Number.isFinite(id) && id > 0 ? id : null
 }
-export const getUserRol = () => localStorage.getItem('userRol') || ''
+
+export const getUserRol = () => {
+  const valor = localStorage.getItem('userRol');
+  if (!valor) return '';
+
+  try {
+    const parsed = JSON.parse(valor);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed.nombre || parsed.authority || parsed.name || '';
+    }
+  } catch (e) {
+    // No es JSON, continuar
+  }
+
+  if (valor === '[object Object]') {
+    return '';
+  }
+
+  return valor;
+};
 
 export const isComprador = () => getUserRol().toLowerCase() === 'comprador'
-export const isVendedor = () => getUserRol().toLowerCase() === 'vendedor'
+
+export const isVendedor = () => {
+  const rol = getUserRol();
+  return rol.toLowerCase() === 'vendedor' || rol.toLowerCase() === 'admin';
+};
+
 export const isAuthenticated = () => Boolean(getToken())
 
 export function getRoleFromToken(token) {
@@ -40,3 +65,36 @@ export function getUserIdFromToken(token) {
     return null
   }
 }
+
+// ==========================================
+// NUEVO: Wrapper para peticiones con control de 401 (Expiración de Token)
+// ==========================================
+export const fetchWithAuth = async (url, options = {}) => {
+  const token = getToken();
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...options.headers,
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  // Si el token expiró o es inválido, el backend responde 401
+  if (response.status === 401) {
+    // 1. Limpiamos todos los datos del localStorage relacionados con la sesión
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userRol');
+
+    // 2. Redirigimos al login (o la raíz si ahí muestras el login)
+    window.location.href = '/login'; 
+    
+    throw new Error('La sesión ha expirado. Por favor, inicia sesión nuevamente.');
+  }
+
+  return response;
+};

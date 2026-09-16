@@ -3,68 +3,73 @@ import Card from 'react-bootstrap/Card'
 import Badge from 'react-bootstrap/Badge'
 
 function SubastaCard({ subasta }) {
-
-  // Lógica para determinar la oferta actual (si hay mejorPuja, se muestra, sino el precioInicial)
   const precioActual = subasta.mejorPuja || subasta.precioInicial || 0
-  const cantidadPujas = subasta.pujas?.length || 0
-
+  const cantidadPujas = subasta?.cantidadPujas || subasta?.pujas?.length || 0;
 
   return (
-    <Card className="h-100 shadow-sm border-0 overflow-hidden">
-      {/* Imagen Referencial */}
-      <div style={{ height: '180px', backgroundColor: '#f8f9fa' }} className="position-relative">
+    <Card className="h-100 border rounded-4 overflow-hidden shadow-sm transition-all hover-shadow" style={{ borderColor: '#eaeef2' }}>
+      {/* Imagen con contenedor limpio */}
+      <div style={{ height: '200px', backgroundColor: '#f4f6f8' }} className="position-relative overflow-hidden">
         <Card.Img 
-        variant="top" 
-        src={subasta.urlImagen || subasta.UrlImagen || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'} 
-        alt={subasta.titulo}
-        style={{ height: '180px', objectFit: 'cover' }}
+          variant="top" 
+          src={subasta.urlImagen || subasta.UrlImagen || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'} 
+          alt={subasta.titulo}
+          style={{ height: '200px', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+          className="card-img-zoom"
         />
-        {/* Badge de Estado flotante */}
-        <div className="position-absolute top-0 end-0 m-2">
-          <Badge bg={subasta.estado === 'Activa' ? 'success' : 'secondary'}>
+        {/* Badge de Estado flotante estilo pill */}
+        <div className="position-absolute top-0 end-0 m-3">
+          <Badge 
+            bg={subasta.estado === 'Activa' ? 'success' : 'secondary'} 
+            className="px-3 py-2 rounded-pill shadow-sm"
+            style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}
+          >
             {subasta.estado || 'Activa'}
           </Badge>
         </div>
       </div>
 
-      <Card.Body className="d-flex flex-column">
-        {/* Categoría */}
-        <div className="mb-1">
-          <span className="text-muted small text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>
+      <Card.Body className="d-flex flex-column p-4">
+        {/* Categoría tipo etiqueta corporativa */}
+        <div className="mb-2">
+          <span 
+            className="d-inline-block px-2 py-1 rounded text-uppercase fw-bold" 
+            style={{ fontSize: '0.65rem', backgroundColor: '#eef2f6', color: '#596780', letterSpacing: '0.5px' }}
+          >
             {subasta.categoriaNombre || 'General'}
           </span>
         </div>
 
-        {/* Título */}
-        <Card.Title className="fs-6 fw-bold mb-2">
+        {/* Título principal */}
+        <Card.Title className="fw-bold mb-2" style={{ fontSize: '1rem', color: '#1a202c' }}>
           <Link to={`/subastas/${subasta.id}`} className="text-decoration-none text-dark stretched-link">
             {subasta.titulo}
           </Link>
         </Card.Title>
 
         {/* Descripción corta */}
-        <Card.Text className="text-secondary small text-truncate mb-3">
+        <Card.Text className="text-muted small mb-4 text-truncate" style={{ fontSize: '0.85rem' }}>
           {subasta.descripcion}
         </Card.Text>
 
         <div className="mt-auto">
-          {/* Oferta más alta y Cantidad de ofertas */}
-          <div className="bg-light p-2 rounded mb-2 d-flex justify-content-between align-items-center">
+          {/* Bloque de Oferta Actual / Pujas minimalista */}
+          <div className="p-3 rounded-3 mb-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: '#f8fafc', border: '1px solid #edf2f7' }}>
             <div>
-              <span className="d-block text-secondary" style={{ fontSize: '0.7rem' }}>Oferta actual</span>
-              <strong className="text-success fs-6">${precioActual.toLocaleString('es-AR')}</strong>
+              <span className="d-block text-muted" style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>Oferta actual</span>
+              <strong style={{ color: '#0d9488', fontSize: '1.1rem' }}>${precioActual.toLocaleString('es-AR')}</strong>
             </div>
             <div className="text-end">
-              <span className="d-block text-secondary" style={{ fontSize: '0.7rem' }}>Pujas</span>
-              <Badge bg="light" text="dark" className="border">
+              <span className="d-block text-muted" style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>Pujas</span>
+              <span className="fw-bold text-dark" style={{ fontSize: '0.9rem' }}>
                 {cantidadPujas} {cantidadPujas === 1 ? 'oferta' : 'ofertas'}
-              </Badge>
+              </span>
             </div>
           </div>
 
-          {/* Contador regresivo visible / Fecha de cierre */}
-          <div className="d-flex align-items-center justify-content-between pt-2 border-top text-muted small">
-            <span>⏱️ Cierra:</span>
+          {/* Fecha de cierre */}
+          <div className="d-flex align-items-center justify-content-between pt-2 border-top text-muted" style={{ fontSize: '0.75rem', borderColor: '#edf2f7 !important' }}>
+            <span className="d-flex align-items-center gap-1">⏱️ Cierra:</span>
             <span className="fw-semibold text-dark">
               {new Date(subasta.fechaFin).toLocaleDateString('es-AR', {
                 day: '2-digit',

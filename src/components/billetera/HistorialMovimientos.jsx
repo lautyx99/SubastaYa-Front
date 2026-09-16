@@ -25,22 +25,32 @@ function HistorialMovimientos({ movimientos }) {
           </tr>
         </thead>
         <tbody>
-          {movimientos.map((m) => (
-            <tr key={m.id}>
-              <td className="small">
-                {new Date(m.fecha).toLocaleString('es-AR')}
-              </td>
-              <td>
-                <Badge bg={tipoBadge[m.tipo] || 'secondary'}>{m.tipo}</Badge>
-              </td>
-              <td className="fw-semibold">
-                ${Number(m.monto).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-              </td>
-              <td className="small text-muted">
-                {m.subastaId ? `#${m.subastaId}` : '—'}
-              </td>
-            </tr>
-          ))}
+          {movimientos.map((m, index) => {
+            const id = m.id || m.Id || index
+            const fecha = m.fecha || m.Fecha
+            const tipo = m.tipo || m.Tipo
+            const monto = m.monto ?? m.Monto ?? 0
+            const subastaId = m.subastaId || m.SubastaId
+
+            return (
+              <tr key={id}>
+                <td className="small">
+                  {fecha ? new Date(fecha).toLocaleString('es-AR') : '—'}
+                </td>
+                <td>
+                  <Badge bg={tipoBadge[tipo] || 'secondary'}>
+                    {tipo || 'Movimiento'}
+                  </Badge>
+                </td>
+                <td className="fw-semibold">
+                  ${Number(monto).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="small text-muted">
+                  {subastaId ? `#${subastaId}` : '—'}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </Table>
     </div>

@@ -33,3 +33,61 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* Estilo base de los enlaces del menú */
+.custom-nav-link {
+  color: var(--color-muted) !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+  border-radius: 50rem !important;
+  padding: 0.4rem 0.9rem !important;
+}
+
+/* Efecto al pasar el mouse (fondo más oscuro + sombra sutil) */
+.custom-nav-link:hover {
+  color: var(--color-text) !important;
+  background-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Estado fijo de la página actual (se queda marcado y con sombra) */
+.custom-nav-link.active-page {
+  color: var(--color-text) !important;
+  background-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+  font-weight: 600 !important;
+}
+
+/* Quitar subrayado y dar estilos limpios a los items del dropdown */
+.dropdown-item {
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem !important;
+}
+
+/* Efecto hover general para los elementos del menú */
+.dropdown-item:hover {
+  background-color: #f1f5f9 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  text-decoration: none !important;
+}
+
+/* Estilo por defecto de Cerrar Sesión dentro del menú (sin rojo inicial) */
+.dropdown-item.dropdown-logout {
+  color: #ef4444 !important; /* Letras rojas discretas por defecto */
+  background-color: transparent !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 0!important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* Al pasar el cursor: cambia a fondo rojo y letras blancas con sombra */
+.dropdown-item.dropdown-logout:hover {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2) !important;
+  text-decoration: none !important;
+}

@@ -23,3 +23,8 @@ export const createSubasta = async (subasta) => {
   const { data } = await apiClient.post('/subasta', subasta);
   return data;
 };
+
+export const deleteSubasta = async(id) => {
+    const {data} = await apiClient.delete(`/subasta/${id}`);
+    return data;
+  };

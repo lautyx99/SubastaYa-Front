@@ -32,11 +32,16 @@ function BilleteraPage() {
     getBilletera(usuarioId)
       .then(async (b) => {
         setBilletera(b)
-        if (b?.id) {
+        // Forzamos la captura sin importar si viene como 'id' o 'Id'
+        const billeteraId = b?.id || b?.Id;
+
+        if (billeteraId) {
           try {
-            const movs = await getMovimientos(b.id)
-            setMovimientos(Array.isArray(movs) ? movs : [])
-          } catch {
+            const movs = await getMovimientos(billeteraId)
+            setMovimientos(Array.isArray(movs) ? movs : (movs?.value || movs?.data || []))
+            window.dispatchEvent(new Event('billeteraActualizada'));
+          } catch (err) {
+            console.error("Error al buscar movimientos:", err);
             setMovimientos([])
           }
         } else {
@@ -86,7 +91,8 @@ function BilleteraPage() {
       </p>
 
       <PanelSaldo billetera={billetera} />
-      <FormCargarSaldo usuarioId={usuarioId} onDepositado={cargar} />
+      <FormCargarSaldo usuarioId={usuarioId} 
+      onDepositado={cargar} />
 
       <Card className="shadow-sm border-0">
         <Card.Body>
