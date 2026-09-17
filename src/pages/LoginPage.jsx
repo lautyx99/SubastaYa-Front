@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -13,6 +13,14 @@ function LoginPage() {
   const [password, setPassword] = useState('123456')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+
+  // 1. Redirigir automáticamente si ya hay una sesión activa o si intentan volver atrás
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      navigate('/', { replace: true })
+    }
+  }, [navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -35,13 +43,16 @@ function LoginPage() {
       if (data.email) localStorage.setItem('userEmail', data.email)
       if (data.nombre) localStorage.setItem('userNombre', data.nombre)
       
-      if (data.rol) localStorage.setItem('userRol', data.rol); else {
-       // fallback desde el JWT
+      if (data.rol) {
+        localStorage.setItem('userRol', data.rol)
+      } else {
+        // fallback desde el JWT
         const rolJwt = getRoleFromToken(token)
         if (rolJwt) localStorage.setItem('userRol', rolJwt)
-        }
+      }
 
-      navigate('/')
+      // 2. Usar { replace: true } para pisar la ruta de login en el historial
+      navigate('/', { replace: true })
     } catch (err) {
       const msg =
         err.response?.data?.message ||

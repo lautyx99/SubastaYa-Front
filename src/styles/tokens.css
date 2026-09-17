@@ -34,6 +34,41 @@ a:hover {
   text-decoration: underline;
 }
 
+.btn-emerald {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Efecto hover ligeramente más oscuro */
+.btn-emerald:hover, 
+.btn-emerald:focus {
+  background-color: #047857 !important;
+  border-color: #047857 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important; /* Sombra sutil verde muy estética */
+}
+
+/* Botón principal oscuro/neutro (Crear subasta) */
+.btn-dark-modern {
+  background-color: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Efecto hover con un tono ligeramente más claro o neutro para dar feedback */
+.btn-dark-modern:hover, 
+.btn-dark-modern:focus {
+  background-color: #1e293b !important;
+  border-color: #1e293b !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important; /* Sombra sutil oscura */
+}
+
 /* Estilo base de los enlaces del menú */
 .custom-nav-link {
   color: var(--color-muted) !important;
@@ -66,6 +101,13 @@ a:hover {
   padding: 0.5rem 1rem !important;
 }
 
+.dropdown-item.active, 
+.dropdown-item:active {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+
 /* Efecto hover general para los elementos del menú */
 .dropdown-item:hover {
   background-color: #f1f5f9 !important;
@@ -90,4 +132,29 @@ a:hover {
   color: #ffffff !important;
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2) !important;
   text-decoration: none !important;
+}
+
+/* Contenedor de imagen uniforme para las tarjetas de subasta */
+.subasta-img-container {
+  width: 100%;
+  height: 200px; /* Puedes ajustar la altura según prefieras (ej. 180px, 220px) */
+  overflow: hidden;
+  background-color: #f1f5f9; /* Color de fondo sutil por si la imagen carga lento */
+}
+
+.subasta-img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Esto hace que la imagen llene el espacio recortándose proporcionalmente sin estirarse */
+  object-position: center;
+  transition: transform 0.3s ease; /* Opcional: un zoom muy suave al pasar el cursor */
+}
+
+/* Efecto hover estético en la imagen */
+.subasta-img-container:hover img {
+  transform: scale(1.03);
+}
+
+.card:hover .card-img-zoom {
+  transform: scale(1.05) !important;
 }

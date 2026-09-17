@@ -8,6 +8,9 @@ import { ToastProvider } from './context/ToastContext'
 import BilleteraPage from './pages/BilleteraPage'
 import SoloVendedores from './components/auth/SoloVendedores'
 import ActividadesPage from './pages/ActividadesPage'
+import AuditoriaPage from './pages/AuditoriaPage'
+import AdminRoute from './components/auth/AdminRoute'
+import RegistroPage from './pages/RegistroPage'
 
 function App() {
 return (
@@ -18,6 +21,7 @@ return (
         <Route path="/" element={<SubastasPage />} />
         <Route path="/subastas/:id" element={<SubastaDetallePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegistroPage />} />
         <Route path="/billetera" element={<BilleteraPage />} />
          <Route
             path="/subastas/nueva"
@@ -27,6 +31,9 @@ return (
             </SoloVendedores>
           }/>
           <Route path="/mis-actividades" element={<ActividadesPage />} />
+          <Route element={<AdminRoute />}>
+          <Route path="/admin/auditoria" element={<AuditoriaPage />} />
+          </Route>
       </Routes>
       </MainLayout>
     </BrowserRouter>

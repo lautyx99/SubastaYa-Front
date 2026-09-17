@@ -32,6 +32,15 @@ export const isVendedor = () => {
   return rol.toLowerCase() === 'vendedor' || rol.toLowerCase() === 'admin';
 };
 
+export const isAdmin = () => {
+  const rol = getUserRol();
+  if (!rol) return false;
+  
+  const rolStr = rol.toString().toLowerCase();
+  return rolStr === 'administrador' || rolStr === 'admin' || rolStr === '3';
+};
+
+
 export const isAuthenticated = () => Boolean(getToken())
 
 export function getRoleFromToken(token) {
@@ -65,6 +74,8 @@ export function getUserIdFromToken(token) {
     return null
   }
 }
+
+
 
 // ==========================================
 // NUEVO: Wrapper para peticiones con control de 401 (Expiración de Token)

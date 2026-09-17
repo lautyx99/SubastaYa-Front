@@ -6,7 +6,7 @@ import Nav from 'react-bootstrap/Nav'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import { getBilletera } from '../../api/billeterasApi'
-import { isVendedor } from '../../utils/auth'
+import { isAdmin, isVendedor } from '../../utils/auth'
 import { Dropdown } from 'react-bootstrap'
 
 function Header() {
@@ -113,8 +113,8 @@ function Header() {
         <Navbar.Toggle aria-controls="main-nav" className="border-0 shadow-none" />
         
         <Navbar.Collapse id="main-nav">
-          {/* Barra de búsqueda central limpia */}
-          <Form className="d-flex mx-lg-4 my-2 my-lg-0 flex-grow-1" style={{ maxWidth: '400px' }} onSubmit={(e) => e.preventDefault()}>
+          {/* Barra de búsqueda con margen automático a la derecha para que no empuje a los demás elementos */}
+          <Form className="d-flex mx-lg-4 my-2 my-lg-0 me-lg-auto" style={{ maxWidth: '400px', width: '100%' }} onSubmit={(e) => e.preventDefault()}>
             <Form.Control 
               type="search" 
               placeholder="Buscar productos o lotes..." 
@@ -125,15 +125,8 @@ function Header() {
             />
           </Form>
 
-          {/* Enlaces de navegación */}
-          <Nav className="me-auto align-items-lg-center gap-lg-2">
-            <Nav.Link as={Link} to="/" className={`custom-nav-link ${location.pathname === '/' || location.pathname.startsWith('/subastas') ? 'active-page' : ''}`}>
-              Subastas
-            </Nav.Link>
-          </Nav>
-
-         {/* Sección Derecha: Saldos y Menú de Usuario */}
-          <div className="d-flex flex-wrap align-items-center gap-3 mt-3 mt-lg-0">
+          {/* Sección Derecha: Forzamos que se alinee a la derecha con ms-lg-auto */}
+          <div className="d-flex flex-wrap align-items-center gap-3 mt-3 mt-lg-0 ms-lg-auto">
             {token && saldoDisponible != null && (
               <div className="d-flex align-items-center gap-3 px-3 py-1 rounded-pill bg-light border" style={{ borderColor: '#edf2f7' }}>
                 <div>
@@ -171,39 +164,49 @@ function Header() {
                     </div>
                   </Dropdown.Toggle>
 
-                 <Dropdown.Menu className="shadow-sm border-0 py-2 mt-2" style={{ borderRadius: '12px', minWidth: '200px' }}>
-                <div className="px-3 py-2 d-xl-none border-bottom mb-1">
-                <span className="text-muted d-block" style={{ fontSize: '0.6rem', textTransform: 'uppercase' }}>Conectado como</span>
-                <span className="fw-bold text-dark" style={{ fontSize: '0.85rem' }}>{nombre || 'Usuario'}</span>
-                </div>
+                  <Dropdown.Menu className="shadow-sm border-0 py-2 mt-2" style={{ borderRadius: '12px', minWidth: '200px' }}>
+                    <div className="px-3 py-2 d-xl-none border-bottom mb-1">
+                      <span className="text-muted d-block" style={{ fontSize: '0.6rem', textTransform: 'uppercase' }}>Conectado como</span>
+                      <span className="fw-bold text-dark" style={{ fontSize: '0.85rem' }}>{nombre || 'Usuario'}</span>
+                    </div>
 
-                <Dropdown.Item as={Link} to="/billetera" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
-                Mi Billetera
-                </Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/billetera" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
+                      Mi Billetera
+                    </Dropdown.Item>
 
-                <Dropdown.Item as={Link} to="/mis-actividades" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
-                Mis Actividades
-                </Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/mis-actividades" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
+                      Mis Actividades
+                    </Dropdown.Item>
 
-                {isVendedor() && (
-                <Dropdown.Item as={Link} to="/subastas/nueva" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
-               Publicar Subasta
-                </Dropdown.Item>
-              )}
+                    {isAdmin() && (
+                      <Dropdown.Item as={Link} to="/admin/auditoria" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
+                        Auditoría
+                      </Dropdown.Item>
+                    )}
 
-              <Dropdown.Divider className="my-1" />
+                    {isVendedor() && (
+                      <Dropdown.Item as={Link} to="/subastas/nueva" className="py-2 px-3 d-flex align-items-center gap-2 text-dark fw-semibold" style={{ fontSize: '0.85rem' }}>
+                        Publicar Subasta
+                      </Dropdown.Item>
+                    )}
 
-              {/* Opción de Cerrar Sesión en Rojo con letras blancas */}
-              <Dropdown.Item onClick={handleLogout} className="py-2 px-3 dropdown-logout d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-               Cerrar Sesión
-              </Dropdown.Item>
-              </Dropdown.Menu>
+                    <Dropdown.Divider className="my-1" />
+
+                    <Dropdown.Item onClick={handleLogout} className="py-2 px-3 dropdown-logout d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
+                      Cerrar Sesión
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
                 </Dropdown>
               </div>
             ) : (
-              <Button as={Link} to="/login" variant="primary" size="sm" className="rounded-pill px-4 py-2 fw-semibold" style={{ fontSize: '0.85rem' }}>
-                Iniciar Sesión
-              </Button>
+              <div className="d-flex align-items-center gap-2">
+                <Button as={Link} to="/login" variant="outline-primary" size="sm" className="rounded-pill px-4 py-2 fw-semibold" style={{ fontSize: '0.85rem' }}>
+                  Iniciar Sesión
+                </Button>
+                <Button as={Link} to="/register" variant="primary" size="sm" className="rounded-pill px-4 py-2 fw-semibold" style={{ fontSize: '0.85rem' }}>
+                  Registrarse
+                </Button>
+              </div>
             )}
           </div>
         </Navbar.Collapse>

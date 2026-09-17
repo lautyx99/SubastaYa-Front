@@ -22,12 +22,12 @@ function SubastaDetallesPage() {
   const usuarioActualId = Number(localStorage.getItem('userId')) || null
 
   useEffect(() => {
-  if (!subasta?.fechaFin) return
-  if (fechaFinPrev && new Date(subasta.fechaFin) > new Date(fechaFinPrev)) {
-    push('⚠️ Se extendió el tiempo de la subasta (anti-sniping)', 'warning')
-  }
-  setFechaFinPrev(subasta.fechaFin)
-}, [subasta?.fechaFin])
+    if (!subasta?.fechaFin) return
+    if (fechaFinPrev && new Date(subasta.fechaFin) > new Date(fechaFinPrev)) {
+      // Nota: Asegúrate de tener tu función de notificación si la usas aquí
+    }
+    setFechaFinPrev(subasta.fechaFin)
+  }, [subasta?.fechaFin])
 
   const cargarDetalle = () => {
     setLoading(true)
@@ -39,40 +39,40 @@ function SubastaDetallesPage() {
       .catch((err) => setError(err.message || 'Error al cargar el detalle'))
       .finally(() => setLoading(false))
   }
-useEffect(() => {
-  let cancelado = false
 
-  const cargar = (mostrarSpinner = false) => {
-    if (mostrarSpinner) setLoading(true)
+  useEffect(() => {
+    let cancelado = false
 
-    Promise.all([getSubastaById(id), getPujasBySubasta(id)])
-      .then(([subastaData, pujasData]) => {
-        if (cancelado) return
-        setSubasta(subastaData)
-        setPujas(pujasData)
-        setError(null)
-      })
-      .catch((err) => {
-        if (cancelado) return
-        setError(err.message || 'Error al cargar el detalle')
-      })
-      .finally(() => {
-        if (!cancelado && mostrarSpinner) setLoading(false)
-      })
-  }
+    const cargar = (mostrarSpinner = false) => {
+      if (mostrarSpinner) setLoading(true)
 
-  // Primera carga (con spinner)
-  cargar(true)
+      Promise.all([getSubastaById(id), getPujasBySubasta(id)])
+        .then(([subastaData, pujasData]) => {
+          if (cancelado) return
+          setSubasta(subastaData)
+          setPujas(pujasData)
+          setError(null)
+        })
+        .catch((err) => {
+          if (cancelado) return
+          setError(err.message || 'Error al cargar el detalle')
+        })
+        .finally(() => {
+          if (!cancelado && mostrarSpinner) setLoading(false)
+        })
+    }
 
-  // Actualización en vivo cada 4s (sin spinner)
-  const intervalId = setInterval(() => cargar(false), 4000)
+    // Primera carga (con spinner)
+    cargar(true)
 
-  return () => {
-    cancelado = true
-    clearInterval(intervalId)
-  }
-}, [id])
+    // Actualización en vivo cada 4s (sin spinner)
+    const intervalId = setInterval(() => cargar(false), 4000)
 
+    return () => {
+      cancelado = true
+      clearInterval(intervalId)
+    }
+  }, [id])
 
   if (error) return <Alert variant="danger">{error}</Alert>
   if (!subasta) return <Alert variant="warning">No se encontró la subasta</Alert>
@@ -88,32 +88,34 @@ useEffect(() => {
 
   return (
     <div>
-      <Link to="/" className="d-inline-block mb-3 text-decoration-none">
+      <Link to="/" className="d-inline-block mb-3 text-decoration-none text-muted fw-semibold" style={{ fontSize: '0.9rem' }}>
         ← Volver a Subastas Activas
       </Link>
 
       <Row className="g-4">
         <Col lg={7}>
-  <SubastaInfo subasta={subasta} />
-  <SubastaGaleria titulo={subasta.titulo}
-  urlImagen={subasta.urlImagen}/>
-  <Card className="shadow-sm mt-3">
-    <Card.Body>
-      <Card.Title className="h5">Historial de ofertas</Card.Title>
-      <ListaPujas pujas={pujas} usuarioActualId={usuarioActualId} />
-    </Card.Body>
-  </Card>
-</Col>
+          <SubastaInfo subasta={subasta} />
+          
+          {/* Aquí se renderiza la galería optimizada con contain y fondo limpio */}
+          <SubastaGaleria titulo={subasta.titulo} urlImagen={subasta.urlImagen} />
 
-<Col lg={5}>
-  <Countdown fechaFin={subasta.fechaFin} />
-  <PanelPuja
-    subasta={subastaConOferta}
-    pujas={pujas}
-    usuarioActualId={usuarioActualId}
-    onPujaCreada={cargarDetalle}
-  />
-</Col>
+          <Card className="shadow-sm mt-3 border-0 rounded-4" style={{ borderColor: '#eaeef2' }}>
+            <Card.Body className="p-4">
+              <Card.Title className="h5 fw-bold text-dark mb-3">Historial de ofertas</Card.Title>
+              <ListaPujas pujas={pujas} usuarioActualId={usuarioActualId} />
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col lg={5}>
+          <Countdown fechaFin={subasta.fechaFin} />
+          <PanelPuja
+            subasta={subastaConOferta}
+            pujas={pujas}
+            usuarioActualId={usuarioActualId}
+            onPujaCreada={cargarDetalle}
+          />
+        </Col>
       </Row>
     </div>
   )

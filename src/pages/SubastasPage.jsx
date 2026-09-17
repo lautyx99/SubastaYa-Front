@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col'
 import Spinner from 'react-bootstrap/Spinner'
 import Alert from 'react-bootstrap/Alert'
 import SubastaCard from '../components/subastas/SubastaCard'
-import { Button, Container, Form } from 'react-bootstrap'
+import { Button, Container, Dropdown, Form } from 'react-bootstrap'
 import { useSearchParams } from 'react-router-dom'
 
 function SubastasPage() {
@@ -14,11 +14,21 @@ function SubastasPage() {
   const [error, setError] = useState(null)
   const [searchParams] = useSearchParams()
 
-  // Estados de filtros
   const [filtroEstado, setFiltroEstado] = useState('Activa') // Por defecto Activas
   const [filtroCategoria, setFiltroCategoria] = useState('')
   const [orden, setOrden] = useState('tiempo-asc') // 'tiempo-asc' o 'precio-desc'
   const queryBusqueda = searchParams.get('busqueda')?.toLowerCase() || ''
+
+
+  const categorias = [
+  { id: "", nombre: "Todas las categorías" },
+  { id: "1", nombre: "Tecnología" },
+  { id: "2", nombre: "Coleccionables" },
+  { id: "3", nombre: "Vehículos" },
+  { id: "4", nombre: "Arte" }
+];
+
+const categoriaActual = categorias.find(c => c.id === filtroCategoria)?.nombre || "Filtrar por categoría";
 
   const subastasFiltradas = subastas
     .filter((s) => {
@@ -93,34 +103,70 @@ return (
 
           {/* Filtro por Categoría */}
           <Col md={4}>
-            <Form.Select 
-              size="sm" 
-              className="bg-light border-0 rounded-pill py-2 px-3"
-              value={filtroCategoria}
-              onChange={(e) => setFiltroCategoria(e.target.value)}
-              style={{ fontSize: '0.85rem' }}
-            >
-              <option value="">Todas las categorías</option>
-              <option value="1">Tecnología</option>
-              <option value="2">Coleccionables</option>
-              <option value="3">Vehículos</option>
-              <option value="4">Arte</option>
-            </Form.Select>
-          </Col>
+          <Dropdown>
+     
+          <Dropdown.Toggle 
+            size="sm"
+            variant="light"
+            className="w-100 bg-light border-0 rounded-pill py-2 px-3 shadow-sm d-flex justify-content-between align-items-center text-start text-secondary fw-medium"
+            style={{ fontSize: '0.85rem' }}
+           >
+          <span>{categoriaActual}</span>
+          </Dropdown.Toggle>
 
+     
+        <Dropdown.Menu className="shadow-sm border-0 rounded-4 p-2 w-100">
+          {categorias.map((cat) => (
+          <Dropdown.Item 
+            key={cat.id} 
+            active={filtroCategoria === cat.id}
+            onClick={() => setFiltroCategoria(cat.id)}
+            className="dropdown-item rounded-pill my-1" // 👈 Aquí aplicamos tu clase de token.css
+            style={{ fontSize: '0.85rem' }}
+          >
+            {cat.nombre}
+          </Dropdown.Item>
+        ))}
+        </Dropdown.Menu>
+        </Dropdown>
+        </Col>
           {/* Ordenamiento */}
           <Col md={4}>
-            <Form.Select 
-              size="sm" 
-              className="bg-light border-0 rounded-pill py-2 px-3"
-              value={orden}
-              onChange={(e) => setOrden(e.target.value)}
-              style={{ fontSize: '0.85rem' }}
+          <Dropdown>
+          <Dropdown.Toggle 
+            size="sm"
+            variant="light"
+            className="w-100 bg-light border-0 rounded-pill py-2 px-3 shadow-sm d-flex justify-content-between align-items-center text-start text-secondary fw-medium"
+            style={{ fontSize: '0.85rem' }}
+          >
+          <span>
+            {orden === "tiempo-asc" && "⏳ Menor tiempo restante (Cierra pronto)"}
+            {orden === "precio-desc" && "💰 Mayor puja actual"}
+            {!orden && "Ordenar por"}
+          </span>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="shadow-sm border-0 rounded-4 p-2 w-100">
+          <Dropdown.Item 
+           active={orden === "tiempo-asc"}
+          onClick={() => setOrden("tiempo-asc")}
+          className="dropdown-item rounded-pill my-1"
+          style={{ fontSize: '0.85rem' }}
             >
-              <option value="tiempo-asc">Menor tiempo restante (Cierra pronto)</option>
-              <option value="precio-desc">Mayor puja actual</option>
-            </Form.Select>
-          </Col>
+          Menor tiempo restante (Cierra pronto)
+          </Dropdown.Item>
+
+          <Dropdown.Item 
+            active={orden === "precio-desc"}
+            onClick={() => setOrden("precio-desc")}
+            className="dropdown-item rounded-pill my-1"
+            style={{ fontSize: '0.85rem' }}
+          >
+         Mayor puja actual
+          </Dropdown.Item>
+        </Dropdown.Menu>
+        </Dropdown>
+        </Col>
         </Row>
       </div>
 

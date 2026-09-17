@@ -170,8 +170,8 @@ const fuiSuperado =
           </div>
 
           <Button
-            variant="primary"
-            className="w-100"
+            variant="success"
+            className="btn-emerald rounded-pill py-2 px-4 shadow-sm"
             disabled={!puedePujar}
             onClick={handlePujar}
           >

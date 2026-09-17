@@ -9,6 +9,7 @@ import Spinner from 'react-bootstrap/Spinner'
 import Col from 'react-bootstrap/Col'
 import { subirImagenACloudinary } from '../api/uploadService'
 import { createSubasta } from '../api/subastasApi' // Asegúrate de tener tu función de API configurada
+import { Dropdown } from 'react-bootstrap'
 
 function CrearSubastaPage() {
   const navigate = useNavigate()
@@ -29,6 +30,7 @@ function CrearSubastaPage() {
   // Estados de control de UI
   const [cargando, setCargando] = useState(false)
   const [errorValidacion, setErrorValidacion] = useState('')
+
 
   // Manejar previsualización local de la imagen seleccionada
   const handleImageChange = (e) => {
@@ -61,11 +63,16 @@ function CrearSubastaPage() {
       return
     }
 
+    // ⬇️ Agregamos esta validación aquí ⬇️
+    if (inicio < ahora) {
+      setErrorValidacion('La fecha y hora de inicio no puede ser una fecha u hora que ya pasó.')
+      return
+    }
+
     if (fin <= inicio) {
       setErrorValidacion('La fecha y hora de finalización debe ser estrictamente posterior a la fecha de inicio.')
       return
     }
-
     try {
       setCargando(true)
       let urlImagenFinal = ''
@@ -131,17 +138,70 @@ function CrearSubastaPage() {
             </Form.Group>
 
             <Form.Group as={Col} md={4}>
-              <Form.Label className="fw-semibold">Categoría</Form.Label>
-              <Form.Select 
-                value={categoriaId}
-                onChange={(e) => setCategoriaId(e.target.value)}
-              >
-                <option value="1">Tecnología</option>
-                <option value="2">Coleccionables</option>
-                <option value="3">Vehículos</option>
-                <option value="4">Arte y Decoración</option>
-                <option value="5">Hogar y Textiles</option>
-              </Form.Select>
+            <Dropdown>
+    <Dropdown.Toggle 
+      size="sm"
+      variant="light"
+      className="w-100 bg-light border-0 rounded-pill py-2 px-3 shadow-sm d-flex justify-content-between align-items-center text-start text-secondary fw-medium"
+      style={{ fontSize: '0.85rem' }}
+    >
+      <span>
+        {categoriaId === "1" && "Tecnología"}
+        {categoriaId === "2" && "Coleccionables"}
+        {categoriaId === "3" && "Vehículos"}
+        {categoriaId === "4" && "Arte y Decoración"}
+        {categoriaId === "5" && "Hogar y Textiles"}
+        {!categoriaId && "Seleccionar categoría"}
+      </span>
+    </Dropdown.Toggle>
+
+    <Dropdown.Menu className="shadow-sm border-0 rounded-4 p-2 w-100">
+      <Dropdown.Item 
+        active={categoriaId === "1"}
+        onClick={() => setCategoriaId("1")}
+        className="dropdown-item rounded-pill my-1"
+        style={{ fontSize: '0.85rem' }}
+      >
+         Tecnología
+      </Dropdown.Item>
+
+      <Dropdown.Item 
+        active={categoriaId === "2"}
+        onClick={() => setCategoriaId("2")}
+        className="dropdown-item rounded-pill my-1"
+        style={{ fontSize: '0.85rem' }}
+      >
+        Coleccionables
+      </Dropdown.Item>
+
+      <Dropdown.Item 
+        active={categoriaId === "3"}
+        onClick={() => setCategoriaId("3")}
+        className="dropdown-item rounded-pill my-1"
+        style={{ fontSize: '0.85rem' }}
+      >
+        Vehículos
+      </Dropdown.Item>
+
+      <Dropdown.Item 
+        active={categoriaId === "4"}
+        onClick={() => setCategoriaId("4")}
+        className="dropdown-item rounded-pill my-1"
+        style={{ fontSize: '0.85rem' }}
+      >
+        Arte y Decoración
+      </Dropdown.Item>
+
+      <Dropdown.Item 
+        active={categoriaId === "5"}
+        onClick={() => setCategoriaId("5")}
+        className="dropdown-item rounded-pill my-1"
+        style={{ fontSize: '0.85rem' }}
+      >
+        Hogar y Textiles
+      </Dropdown.Item>
+    </Dropdown.Menu>
+  </Dropdown>
             </Form.Group>
           </div>
 
@@ -227,7 +287,7 @@ function CrearSubastaPage() {
 
           {/* BOTÓN DE ACCIÓN */}
           <div className="d-grid">
-            <Button variant="primary" type="submit" size="lg" disabled={cargando}>
+            <Button className="btn-dark-modern rounded-pill py-2 px-4 shadow-sm" type="submit" size="lg" disabled={cargando}>
               {cargando ? (
                 <>
                   <Spinner animation="border" size="sm" className="me-2" />

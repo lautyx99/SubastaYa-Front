@@ -52,13 +52,12 @@ function FormCargarSaldo({ usuarioId, onDepositado }) {
             <Form.Control
               type="number"
               min="1"
-              step="100"
               value={monto}
               onChange={(e) => setMonto(e.target.value)}
               placeholder="Ej: 10000"
             />
           </Form.Group>
-          <Button type="submit" variant="primary" disabled={loading}>
+          <Button variant="success" className="btn-emerald rounded-pill py-2 px-4 shadow-sm" disabled={loading}>
             {loading ? 'Procesando...' : '+ Cargar saldo'}
           </Button>
         </Form>

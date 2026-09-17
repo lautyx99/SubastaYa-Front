@@ -9,14 +9,19 @@ function SubastaCard({ subasta }) {
   return (
     <Card className="h-100 border rounded-4 overflow-hidden shadow-sm transition-all hover-shadow" style={{ borderColor: '#eaeef2' }}>
       {/* Imagen con contenedor limpio */}
-      <div style={{ height: '200px', backgroundColor: '#f4f6f8' }} className="position-relative overflow-hidden">
-        <Card.Img 
-          variant="top" 
-          src={subasta.urlImagen || subasta.UrlImagen || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'} 
-          alt={subasta.titulo}
-          style={{ height: '200px', objectFit: 'cover', transition: 'transform 0.3s ease' }}
-          className="card-img-zoom"
-        />
+      <div style={{ height: '280px', backgroundColor: '#f4f6f8' }} className="position-relative overflow-hidden d-flex align-items-center justify-content-center p-3">
+    <Card.Img 
+      variant="top" 
+      src={subasta.urlImagen || subasta.UrlImagen || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'} 
+      alt={subasta.titulo}
+      className={`card-img-zoom img-fluid`}
+      style={{ 
+        maxHeight: '100%', 
+        maxWidth: '100%',
+        objectFit: 'contain', // 👈 Esto evita que se recorte y muestra la foto completa
+        objectPosition: 'center'
+      }}
+    />
         {/* Badge de Estado flotante estilo pill */}
         <div className="position-absolute top-0 end-0 m-3">
           <Badge 
@@ -76,7 +81,7 @@ function SubastaCard({ subasta }) {
                 month: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit'
-              })} hs
+              })}
             </span>
           </div>
         </div>
