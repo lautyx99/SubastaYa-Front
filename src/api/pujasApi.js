@@ -5,7 +5,7 @@ export const getPujasBySubasta = async (subastaId) => {
   return data
 }
 
-// para más adelante
+
 export const crearPuja = async ({ subastaId, monto }) => {
   const { data } = await apiClient.post(`/subastas/${subastaId}/pujas`, {
     subastaId,

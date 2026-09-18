@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Table, Spinner, Alert, Badge, Form, Row, Col, Button } from 'react-bootstrap';
-import { fetchWithAuth } from '../utils/auth'; // Tu wrapper que maneja el 401 automáticamente
+import { fetchWithAuth } from '../utils/auth'; 
 
 const AuditoriaPage = () => {
   const [logs, setLogs] = useState([]);
@@ -12,7 +12,6 @@ const AuditoriaPage = () => {
   useEffect(() => {
     const fetchAuditoria = async () => {
       try {
-        // Petición protegida al backend (si el token expira, fetchWithAuth redirige al login)
         const response = await fetchWithAuth('http://localhost:55976/api/Auditoria');
         
         if (!response.ok) {
@@ -45,7 +44,7 @@ const AuditoriaPage = () => {
 
   const fetchLogsFiltrados = async (entidadNombre, id) => {
   try {
-    // Construyes la URL condicionalmente
+
     let url = 'http://localhost:55976/api/Auditoria';
     if (entidadNombre && id) {
       url += `?entidad=${encodeURIComponent(entidadNombre)}&entidadId=${id}`;
@@ -61,17 +60,17 @@ const AuditoriaPage = () => {
   }
 };
 
-// Se ejecuta cuando el usuario presiona "Filtrar"
+
   const handleFiltrar = (e) => {
     e.preventDefault();
     fetchLogsFiltrados(entidadInput, entidadIdInput);
   };
 
-  // Se ejecuta cuando el usuario quiere limpiar los campos y ver todo
+
   const handleLimpiar = () => {
     setEntidadInput('');
     setEntidadIdInput('');
-    fetchLogsFiltrados('', ''); // Vuelve a traer todos sin filtros
+    fetchLogsFiltrados('', '');
   };
 
  return (
@@ -93,7 +92,6 @@ const AuditoriaPage = () => {
                 <option value="Usuario">Usuario</option>
                 <option value="Producto">Producto</option>
                 <option value="Rol">Rol</option>
-                {/* Agrega aquí más opciones según las entidades que tengas en tu backend */}
               </Form.Select>
             </Form.Group>
           </Col>

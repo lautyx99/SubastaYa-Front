@@ -16,7 +16,6 @@ const RegistroPage = () => {
     setError(null);
 
     try {
-      // Ajusta la URL según el endpoint de registro de tu backend
       const response = await fetch('http://localhost:55976/api/v1/auth/registro', {
         method: 'POST',
         headers: {
@@ -37,7 +36,7 @@ const RegistroPage = () => {
 
       setSuccess(true);
       setTimeout(() => {
-        navigate('/login'); // Redirige al login tras unos segundos
+        navigate('/login');
       }, 2000);
 
     } catch (err) {

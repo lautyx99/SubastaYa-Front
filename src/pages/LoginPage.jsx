@@ -14,7 +14,7 @@ function LoginPage() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  // 1. Redirigir automáticamente si ya hay una sesión activa o si intentan volver atrás
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
@@ -46,13 +46,13 @@ function LoginPage() {
       if (data.rol) {
         localStorage.setItem('userRol', data.rol)
       } else {
-        // fallback desde el JWT
         const rolJwt = getRoleFromToken(token)
         if (rolJwt) localStorage.setItem('userRol', rolJwt)
       }
 
-      // 2. Usar { replace: true } para pisar la ruta de login en el historial
-      navigate('/', { replace: true })
+      sessionStorage.setItem('mostrarOnboarding', 'true')
+
+      navigate('/', { replace: true, state: { mostrarOnboarding: true } })
     } catch (err) {
       const msg =
         err.response?.data?.message ||

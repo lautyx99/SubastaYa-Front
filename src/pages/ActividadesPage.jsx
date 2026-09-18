@@ -4,7 +4,7 @@ import SubastaCard from '../components/subastas/SubastaCard';
 
 function ActividadesPage(){
 
-   const [tabActiva, setTabActiva] = useState('compras'); // 'compras' o 'publicaciones'
+   const [tabActiva, setTabActiva] = useState('compras'); 
   const [compras, setCompras] = useState([]);
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ function ActividadesPage(){
     const fetchMisDatos = async () => {
       setLoading(true);
       try {
-        // Recuperamos el token JWT del almacenamiento local (ajusta la clave si usas otra, ej: 'token', 'jwt', etc.)
+       
         const token = localStorage.getItem('token'); 
 
         const headers = {
@@ -22,7 +22,6 @@ function ActividadesPage(){
           'Authorization': `Bearer ${token}`
         };
 
-        // 1. Petición a Mis Compras / Pujas
         const resPujas = await fetch('http://localhost:55976/api/Subasta/mis-pujas', { headers });
         if (!resPujas.ok) throw new Error('Error al cargar tus pujas.');
         const dataPujas = await resPujas.json();

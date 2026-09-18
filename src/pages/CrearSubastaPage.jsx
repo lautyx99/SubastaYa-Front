@@ -8,13 +8,12 @@ import Alert from 'react-bootstrap/Alert'
 import Spinner from 'react-bootstrap/Spinner'
 import Col from 'react-bootstrap/Col'
 import { subirImagenACloudinary } from '../api/uploadService'
-import { createSubasta } from '../api/subastasApi' // Asegúrate de tener tu función de API configurada
+import { createSubasta } from '../api/subastasApi'
 import { Dropdown } from 'react-bootstrap'
+import { getCategorias } from '../api/categoriasApi'
 
 function CrearSubastaPage() {
   const navigate = useNavigate()
-
-  // Estados del formulario
   const [titulo, setTitulo] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [categoriaId, setCategoriaId] = useState('1')
@@ -22,17 +21,27 @@ function CrearSubastaPage() {
   const [incrementoMinimo, setIncrementoMinimo] = useState('')
   const [fechaInicio, setFechaInicio] = useState('')
   const [fechaFin, setFechaFin] = useState('')
-  
-  // Archivo e imagen
   const [imagenFile, setImagenFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
-
-  // Estados de control de UI
   const [cargando, setCargando] = useState(false)
   const [errorValidacion, setErrorValidacion] = useState('')
+  const [categorias, setCategorias] = useState([])
 
 
-  // Manejar previsualización local de la imagen seleccionada
+
+  useEffect(() => {
+    getCategorias()
+      .then((data) => {
+        setCategorias(data)
+        if (data.length > 0 && !categoriaId) {
+          setCategoriaId(String(data[0].id))
+        }
+      })
+      .catch((err) => console.error("Error al cargar categorías en formulario:", err))
+  }, [])
+
+  const categoriaActualNombre = categorias.find(c => String(c.id) === String(categoriaId))?.nombre || "Seleccionar categoría"
+
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -41,7 +50,7 @@ function CrearSubastaPage() {
     }
   }
 
-  // Lógica principal de envío con validaciones en pantalla
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorValidacion('')
@@ -53,6 +62,12 @@ function CrearSubastaPage() {
     const fin = new Date(fechaFin)
     const ahora = new Date()
 
+
+    if (!categoriaId) {
+      setErrorValidacion('Debe seleccionar una categoría para la subasta.')
+      return
+    }
+
     if (precioNum <= 0 || isNaN(precioNum)) {
       setErrorValidacion('El precio base inicial debe ser un valor positivo mayor a 0.')
       return
@@ -63,7 +78,6 @@ function CrearSubastaPage() {
       return
     }
 
-    // ⬇️ Agregamos esta validación aquí ⬇️
     if (inicio < ahora) {
       setErrorValidacion('La fecha y hora de inicio no puede ser una fecha u hora que ya pasó.')
       return
@@ -77,16 +91,14 @@ function CrearSubastaPage() {
       setCargando(true)
       let urlImagenFinal = ''
 
-      // 2. Subir imagen a Cloudinary (si seleccionó archivo)
       if (imagenFile) {
         urlImagenFinal = await subirImagenACloudinary(imagenFile)
       }
 
-      // 3. Construir DTO que espera tu backend (CrearSubastaDto)
       const nuevaSubastaDto = {
        titulo: titulo.trim(),
        descripcion: descripcion.trim(),
-       urlImagen: urlImagenFinal, // La URL que te devolvió Cloudinary
+       urlImagen: urlImagenFinal,
        precioInicial: precioNum,
        incrementoMinimo: incrementoNum,
        categoriaId: parseInt(categoriaId),
@@ -94,14 +106,10 @@ function CrearSubastaPage() {
        fechaFin: fin.toISOString()
       }
 
-      console.log("JSON exacto que se va por Axios:", JSON.stringify(nuevaSubastaDto, null, 2));
-
-      console.log("Lo que se envía al backend:", nuevaSubastaDto);
-
      await createSubasta(nuevaSubastaDto);
 
       alert('¡Subasta publicada con éxito!')
-      navigate('/') // Redirige al catálogo
+      navigate('/') 
 
     } catch (err) {
       setErrorValidacion(err.message || 'Ocurrió un error al procesar la publicación.')
@@ -138,70 +146,32 @@ function CrearSubastaPage() {
             </Form.Group>
 
             <Form.Group as={Col} md={4}>
-            <Dropdown>
-    <Dropdown.Toggle 
-      size="sm"
-      variant="light"
-      className="w-100 bg-light border-0 rounded-pill py-2 px-3 shadow-sm d-flex justify-content-between align-items-center text-start text-secondary fw-medium"
-      style={{ fontSize: '0.85rem' }}
-    >
-      <span>
-        {categoriaId === "1" && "Tecnología"}
-        {categoriaId === "2" && "Coleccionables"}
-        {categoriaId === "3" && "Vehículos"}
-        {categoriaId === "4" && "Arte y Decoración"}
-        {categoriaId === "5" && "Hogar y Textiles"}
-        {!categoriaId && "Seleccionar categoría"}
-      </span>
-    </Dropdown.Toggle>
+              <Form.Label className="fw-semibold">Categoría</Form.Label>
+              <Dropdown>
+                <Dropdown.Toggle 
+                  size="sm"
+                  variant="light"
+                  className="w-100 bg-light border-0 rounded-pill py-2 px-3 shadow-sm d-flex justify-content-between align-items-center text-start text-secondary fw-medium"
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  <span>{categoriaActualNombre}</span>
+                </Dropdown.Toggle>
 
-    <Dropdown.Menu className="shadow-sm border-0 rounded-4 p-2 w-100">
-      <Dropdown.Item 
-        active={categoriaId === "1"}
-        onClick={() => setCategoriaId("1")}
-        className="dropdown-item rounded-pill my-1"
-        style={{ fontSize: '0.85rem' }}
-      >
-         Tecnología
-      </Dropdown.Item>
-
-      <Dropdown.Item 
-        active={categoriaId === "2"}
-        onClick={() => setCategoriaId("2")}
-        className="dropdown-item rounded-pill my-1"
-        style={{ fontSize: '0.85rem' }}
-      >
-        Coleccionables
-      </Dropdown.Item>
-
-      <Dropdown.Item 
-        active={categoriaId === "3"}
-        onClick={() => setCategoriaId("3")}
-        className="dropdown-item rounded-pill my-1"
-        style={{ fontSize: '0.85rem' }}
-      >
-        Vehículos
-      </Dropdown.Item>
-
-      <Dropdown.Item 
-        active={categoriaId === "4"}
-        onClick={() => setCategoriaId("4")}
-        className="dropdown-item rounded-pill my-1"
-        style={{ fontSize: '0.85rem' }}
-      >
-        Arte y Decoración
-      </Dropdown.Item>
-
-      <Dropdown.Item 
-        active={categoriaId === "5"}
-        onClick={() => setCategoriaId("5")}
-        className="dropdown-item rounded-pill my-1"
-        style={{ fontSize: '0.85rem' }}
-      >
-        Hogar y Textiles
-      </Dropdown.Item>
-    </Dropdown.Menu>
-  </Dropdown>
+                {/* Menú generado dinámicamente desde la BD */}
+                <Dropdown.Menu className="shadow-sm border-0 rounded-4 p-2 w-100">
+                  {categorias.map((cat) => (
+                    <Dropdown.Item 
+                      key={cat.id}
+                      active={String(categoriaId) === String(cat.id)}
+                      onClick={() => setCategoriaId(String(cat.id))}
+                      className="dropdown-item rounded-pill my-1"
+                      style={{ fontSize: '0.85rem' }}
+                    >
+                      {cat.nombre}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
             </Form.Group>
           </div>
 

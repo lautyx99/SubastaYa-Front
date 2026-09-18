@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Container from 'react-bootstrap/Container'
 import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import { getBilletera } from '../../api/billeterasApi'
 import { isAdmin, isVendedor } from '../../utils/auth'
-import { Dropdown } from 'react-bootstrap'
+import { Dropdown, Popover } from 'react-bootstrap'
 
 function Header() {
   const token = localStorage.getItem('token')
@@ -15,12 +14,27 @@ function Header() {
   const usuarioId = Number(localStorage.getItem('userId'))
   const navigate = useNavigate()
   const location = useLocation()
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams()
   const [terminoBusqueda, setTerminoBusqueda] = useState(searchParams.get('busqueda') || '')
   const [saldoDisponible, setSaldoDisponible] = useState(null)
   const [saldoRetenido, setSaldoRetenido] = useState(null)
+  const [showPopover, setShowPopover] = useState(false)
 
+useEffect(() => {
+    const debeMostrar = sessionStorage.getItem('mostrarOnboarding')
+    
+    if (debeMostrar === 'true') {
+      sessionStorage.removeItem('mostrarOnboarding') // Lo borramos de inmediato para que no se repita
+      
+      // Esperamos 5 segundos (5000 ms) antes de mostrar el popover
+      const timer = setTimeout(() => {
+        setShowPopover(true)
+      }, 5000)
 
+      // Limpiamos el temporizador si el componente se desmonta antes de tiempo
+      return () => clearTimeout(timer)
+    }
+  }, [location.pathname])
   const cargarSaldo = () => {
     if (!token || !usuarioId) {
       setSaldoDisponible(null)
@@ -39,17 +53,9 @@ function Header() {
       })
   }
 
-
   useEffect(() => {
     cargarSaldo()
   }, [token, usuarioId])
-
-  useEffect(() => {
-    const onFocus = () => cargarSaldo()
-    window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
-  }, [token, usuarioId])
-
 
   useEffect(() => {
     const handleActualizacion = () => cargarSaldo()
@@ -62,7 +68,6 @@ function Header() {
       window.removeEventListener('billeteraActualizada', handleActualizacion)
     }
   }, [token, usuarioId])
-
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -79,7 +84,6 @@ function Header() {
     const valor = e.target.value
     setTerminoBusqueda(valor)
 
-    // Actualiza los parámetros de la URL en tiempo real
     if (valor.trim() !== '') {
       setSearchParams({ busqueda: valor })
     } else {
@@ -92,28 +96,28 @@ function Header() {
       <Container fluid className="px-4">
         {/* Brand */}
         <Navbar.Brand as={Link} to="/" className="fw-bold text-dark fs-5 d-flex align-items-center gap-2">
-
-        <div 
-        className="d-flex align-items-center justify-content-center rounded-3 text-white fw-bold shadow-sm"
-        style={{ 
-          width: '36px', 
-          height: '36px', 
-          backgroundColor: '#0F172A', /* Color oscuro principal de tus tokens */
-          fontSize: '0.95rem',
-          letterSpacing: '-0.5px'
-          }}>
-          SY
+          <div 
+            className="d-flex align-items-center justify-content-center rounded-3 text-white fw-bold shadow-sm"
+            style={{ 
+              width: '36px', 
+              height: '36px', 
+              backgroundColor: '#0F172A', 
+              fontSize: '0.95rem',
+              letterSpacing: '-0.5px'
+            }}
+          >
+            SY
           </div>
 
           <span style={{ fontWeight: 800, letterSpacing: '-0.5px', color: '#0F172A', fontSize: '1.2rem' }}>
-           Subasta<span style={{ color: '#0d9488' }}>Ya</span>
+            Subasta<span style={{ color: '#0d9488' }}>Ya</span>
           </span>
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="main-nav" className="border-0 shadow-none" />
         
         <Navbar.Collapse id="main-nav">
-          {/* Barra de búsqueda con margen automático a la derecha para que no empuje a los demás elementos */}
+          {/* Barra de búsqueda */}
           <Form className="d-flex mx-lg-4 my-2 my-lg-0 me-lg-auto" style={{ maxWidth: '400px', width: '100%' }} onSubmit={(e) => e.preventDefault()}>
             <Form.Control 
               type="search" 
@@ -125,7 +129,7 @@ function Header() {
             />
           </Form>
 
-          {/* Sección Derecha: Forzamos que se alinee a la derecha con ms-lg-auto */}
+          {/* Sección Derecha */}
           <div className="d-flex flex-wrap align-items-center gap-3 mt-3 mt-lg-0 ms-lg-auto">
             {token && saldoDisponible != null && (
               <div className="d-flex align-items-center gap-3 px-3 py-1 rounded-pill bg-light border" style={{ borderColor: '#edf2f7' }}>
@@ -145,8 +149,14 @@ function Header() {
             )}
 
             {token ? (
-              <div className="d-flex align-items-center gap-3">
-                <Dropdown align="end">
+              <div className="d-flex align-items-center gap-3 position-relative">
+                {/* Menú Desplegable */}
+                <Dropdown 
+                  align="end" 
+                  onToggle={(isOpen) => {
+                    if (isOpen && showPopover) setShowPopover(false)
+                  }}
+                >
                   <Dropdown.Toggle 
                     variant="light" 
                     id="dropdown-usuario" 
@@ -197,6 +207,52 @@ function Header() {
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
+
+                {/* Cartel flotante de bienvenida */}
+                {showPopover && (
+                  <div 
+                    className="position-absolute shadow-lg bg-white border-0 rounded-4 p-3 text-center"
+                    style={{ 
+                      top: 'calc(100% + 10px)', 
+                      right: '0', 
+                      minWidth: '230px', 
+                      zIndex: 9999,
+                      border: '1px solid var(--color-border)',
+                      boxShadow: 'var(--shadow)',
+                      animation: 'fadeInSlow 0.6s ease-in-out',
+                      opacity: 1
+                    }}
+                  ><style>
+                  {`
+                  @keyframes fadeInSlow {
+                  from {
+                  opacity: 0;
+                  transform: translateY(-4px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                  }
+                  `}
+                    </style>
+                    <p className="mb-2 fw-semibold text-dark" style={{ fontSize: '0.9rem' }}>
+                      ¡Bienvenido! 👋
+                    </p>
+                    <p className="mb-2 text-muted" style={{ fontSize: '0.80rem', lineHeight: '1.3' }}>
+                      Haz clic aquí para publicar subastas, cargar saldo o ver tus actividades.
+                    </p>
+                    <Button 
+                      variant="primary" 
+                      size="sm" 
+                      className="w-100 rounded-pill py-1" 
+                      style={{ fontSize: '0.75rem' }}
+                      onClick={() => setShowPopover(false)}
+                    >
+                      Entendido
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="d-flex align-items-center gap-2">

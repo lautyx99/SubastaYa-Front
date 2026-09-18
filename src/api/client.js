@@ -7,7 +7,7 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor de request (después sirve para JWT)
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -19,12 +19,11 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor de response (manejo básico de errores)
+
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // más adelante: redirigir a login
       console.warn('No autorizado');
     }
     return Promise.reject(error);

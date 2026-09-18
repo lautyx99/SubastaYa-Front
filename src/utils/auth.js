@@ -15,7 +15,7 @@ export const getUserRol = () => {
       return parsed.nombre || parsed.authority || parsed.name || '';
     }
   } catch (e) {
-    // No es JSON, continuar
+
   }
 
   if (valor === '[object Object]') {
@@ -94,14 +94,12 @@ export const fetchWithAuth = async (url, options = {}) => {
     headers,
   });
 
-  // Si el token expiró o es inválido, el backend responde 401
+
   if (response.status === 401) {
-    // 1. Limpiamos todos los datos del localStorage relacionados con la sesión
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('userRol');
 
-    // 2. Redirigimos al login (o la raíz si ahí muestras el login)
     window.location.href = '/login'; 
     
     throw new Error('La sesión ha expirado. Por favor, inicia sesión nuevamente.');

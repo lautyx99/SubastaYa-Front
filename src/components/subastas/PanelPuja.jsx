@@ -69,7 +69,6 @@ const fuiSuperado =
 
       window.dispatchEvent(new Event('billeteraActualizada'));
 
-      // Solo si salió bien
       push(`¡Puja registrada por $${montoNumero.toLocaleString('es-AR')}!`, 'success')
       setExito(`¡Puja registrada por $${montoNumero.toLocaleString('es-AR')}!`)
       onPujaCreada?.()
@@ -81,7 +80,7 @@ const fuiSuperado =
       err.message ||
       'No se pudo realizar la puja'
 
-      // Error (400 saldo, validación, etc.)
+  
       if (err.response?.status === 400) {
       push(msg || 'Fondos insuficientes o monto inválido', 'danger')
       } else {

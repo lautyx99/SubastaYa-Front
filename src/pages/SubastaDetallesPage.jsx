@@ -24,7 +24,6 @@ function SubastaDetallesPage() {
   useEffect(() => {
     if (!subasta?.fechaFin) return
     if (fechaFinPrev && new Date(subasta.fechaFin) > new Date(fechaFinPrev)) {
-      // Nota: Asegúrate de tener tu función de notificación si la usas aquí
     }
     setFechaFinPrev(subasta.fechaFin)
   }, [subasta?.fechaFin])
@@ -62,10 +61,8 @@ function SubastaDetallesPage() {
         })
     }
 
-    // Primera carga (con spinner)
     cargar(true)
 
-    // Actualización en vivo cada 4s (sin spinner)
     const intervalId = setInterval(() => cargar(false), 4000)
 
     return () => {
@@ -95,10 +92,7 @@ function SubastaDetallesPage() {
       <Row className="g-4">
         <Col lg={7}>
           <SubastaInfo subasta={subasta} />
-          
-          {/* Aquí se renderiza la galería optimizada con contain y fondo limpio */}
           <SubastaGaleria titulo={subasta.titulo} urlImagen={subasta.urlImagen} />
-
           <Card className="shadow-sm mt-3 border-0 rounded-4" style={{ borderColor: '#eaeef2' }}>
             <Card.Body className="p-4">
               <Card.Title className="h5 fw-bold text-dark mb-3">Historial de ofertas</Card.Title>

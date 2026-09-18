@@ -17,7 +17,5 @@ export const depositarSaldo = async ({ usuarioId, monto }) => {
     usuarioId: Number(usuarioId),
     monto: Number(monto),
   })
-  // Si tu DepositoDto usa PascalCase y no camelCase:
-  // { UsuarioId: Number(usuarioId), Monto: Number(monto) }
   return data
 }

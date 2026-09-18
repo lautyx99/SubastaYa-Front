@@ -6,5 +6,4 @@ export const login = async ({ email, password }) => {
     password,
   })
   return data
-  // esperamos algo como: { token, email, nombre, rol }
 }

@@ -30,3 +30,31 @@ Asegúrate de que la URL base de las peticiones HTTP apunte correctamente a la d
 Inicia el servidor local del cliente ejecutando:
 
 npm run dev
+
+
+### Tener en cuenta para las pruebas los siguientos usuarios registrados:
+
+Usuario Vendedor: 
+Email: vendedor@test.com
+Contraseña: 123456
+Rol: Vendedor
+
+Usuario Comprador1:
+Email: comprador1@test.com
+Contraseña: 123456
+Rol: Comprador
+
+Usuario Comprador2:
+Email: comprador2@test.com
+Contraseña: 123456
+Rol: Comprador
+
+Usuario Sin Fondos:
+Email: sinfondos@test.com
+Contraseña: 123456
+Rol: Comprador
+
+Usuario Administrador:
+Email: admin@test.com
+Contraseña:123456
+Rol: Administrador

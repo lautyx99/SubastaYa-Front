@@ -48,7 +48,7 @@ a:hover {
   background-color: #047857 !important;
   border-color: #047857 !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important; /* Sombra sutil verde muy estética */
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
 }
 
 /* Botón principal oscuro/neutro (Crear subasta) */
@@ -66,7 +66,7 @@ a:hover {
   background-color: #1e293b !important;
   border-color: #1e293b !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important; /* Sombra sutil oscura */
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important; 
 }
 
 /* Estilo base de los enlaces del menú */
@@ -79,14 +79,14 @@ a:hover {
   padding: 0.4rem 0.9rem !important;
 }
 
-/* Efecto al pasar el mouse (fondo más oscuro + sombra sutil) */
+/* Efecto al pasar el mouse*/
 .custom-nav-link:hover {
   color: var(--color-text) !important;
   background-color: #e2e8f0 !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
 }
 
-/* Estado fijo de la página actual (se queda marcado y con sombra) */
+/* Estado fijo de la página actual */
 .custom-nav-link.active-page {
   color: var(--color-text) !important;
   background-color: #e2e8f0 !important;
@@ -117,7 +117,7 @@ a:hover {
 
 /* Estilo por defecto de Cerrar Sesión dentro del menú (sin rojo inicial) */
 .dropdown-item.dropdown-logout {
-  color: #ef4444 !important; /* Letras rojas discretas por defecto */
+  color: #ef4444 !important; 
   background-color: transparent !important;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -137,17 +137,17 @@ a:hover {
 /* Contenedor de imagen uniforme para las tarjetas de subasta */
 .subasta-img-container {
   width: 100%;
-  height: 200px; /* Puedes ajustar la altura según prefieras (ej. 180px, 220px) */
+  height: 200px;
   overflow: hidden;
-  background-color: #f1f5f9; /* Color de fondo sutil por si la imagen carga lento */
+  background-color: #f1f5f9; 
 }
 
 .subasta-img-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Esto hace que la imagen llene el espacio recortándose proporcionalmente sin estirarse */
+  object-fit: cover;
   object-position: center;
-  transition: transform 0.3s ease; /* Opcional: un zoom muy suave al pasar el cursor */
+  transition: transform 0.3s ease;
 }
 
 /* Efecto hover estético en la imagen */

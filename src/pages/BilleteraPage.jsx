@@ -32,7 +32,7 @@ function BilleteraPage() {
     getBilletera(usuarioId)
       .then(async (b) => {
         setBilletera(b)
-        // Forzamos la captura sin importar si viene como 'id' o 'Id'
+
         const billeteraId = b?.id || b?.Id;
 
         if (billeteraId) {
